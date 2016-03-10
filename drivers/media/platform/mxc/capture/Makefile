@@ -18,6 +18,8 @@ obj-$(CONFIG_MXC_CAMERA_OV5640_MIPI) += ov5640_camera_mipi_int.o
 tc358743_h2c_bridge-objs := tc358743_h2c.o
 obj-$(CONFIG_MXC_HDMI_CSI2_TC358743) += tc358743_h2c_bridge.o
 
+obj-$(CONFIG_MXC_VIDEO_TAU2_PARALLEL) += tau2-parallel.o
+
 adv7180_tvin-objs := adv7180.o
 obj-$(CONFIG_MXC_TVIN_ADV7180) += adv7180_tvin.o
 

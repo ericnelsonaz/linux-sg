@@ -50,6 +50,16 @@ config TC358743_AUDIO
 	---help---
 	  Enables audio support from HDMI input
 
+config MXC_VIDEO_TAU2_PARALLEL
+	tristate "FLIR Tau 2 Parallel"
+	depends on VIDEO_V4L2 && SPI
+	help
+	  Support for FLIR Tau 2 camera sensor
+	  http://www.flir.com/cores/display/?id=54717
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called tau2-parallel.
+
 config MXC_TVIN_ADV7180
 	tristate "Analog Device adv7180 TV Decoder Input support"
 	depends on !VIDEO_MXC_EMMA_CAMERA && I2C
