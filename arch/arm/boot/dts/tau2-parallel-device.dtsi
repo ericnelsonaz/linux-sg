@@ -1,0 +1,12 @@
+/ {
+	soc {
+		tau2: tau2 {
+			compatible = "flir,tau2-parallel";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_j12>;
+			ipu = <1>;
+			csi = <1>;
+		};
+	};
+};
+

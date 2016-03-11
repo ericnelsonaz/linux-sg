@@ -223,6 +223,8 @@ dtb-$(CONFIG_ARCH_MXC) += \
 	imx6q-sbc6x.dtb \
 	imx6q-snap.dtb \
 	imx6q-ta.dtb \
+	imx6q-tau2_parallel-n6max.dtb \
+	imx6q-tau2_parallel-n6x.dtb \
 	imx6q-udoo.dtb \
 	imx6q-usd.dtb \
 	imx6q-utc.dtb \

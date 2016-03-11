@@ -1,0 +1,92 @@
+/*
+ * Copyright 2015 Boundary Devices, Inc.
+ * Copyright 2012 Freescale Semiconductor, Inc.
+ * Copyright 2011 Linaro Ltd.
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/interrupt-controller/irq.h>
+#include "imx6q.dtsi"
+#include "imx6qdl-nitrogen6x.dtsi"
+
+/ {
+	model = "Sensor Group camera board - nitrogen6x";
+	compatible = "fsl,imx6q-tau2_parallel-n6max", "fsl,imx6q";
+};
+
+&adv7180 {
+	status="disabled";
+};
+
+&fb_hdmi {
+	status = "okay";
+};
+
+&fb_lcd {
+	status = "disabled";
+};
+
+&fb_lvds {
+	status = "disabled";
+};
+
+&hdmi_core {
+	ipu_id = <1>;
+};
+
+&ov5640 {
+	status="disabled";
+};
+
+&ov5640_mipi {
+	status="disabled";
+};
+
+&sata {
+	status = "okay";
+};
+
+/* tau2 parallel is on v4l2_cap_0 */
+
+&v4l2_cap_0 {
+	ipu_id = <1>;
+	csi_id = <1>;
+	mclk_source = <0>;
+	status = "okay";
+};
+
+&v4l2_cap_1 {
+	status="disabled";
+};
+
+&v4l2_cap_2 {
+	status="disabled";
+};
+
+&v4l2_cap_3 {
+	status="disabled";
+};
+
+&iomuxc_imx6q_nitrogen6x {
+	#include "tau2-parallel-pinctrl.dtsi"
+};
+
+&uart4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_j5>;
+	status = "okay";
+};
+
+&uart5 {
+	status = "okay";
+};
+
+#include "tau2-parallel-device.dtsi"

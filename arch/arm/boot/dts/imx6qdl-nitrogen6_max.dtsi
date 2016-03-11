@@ -697,7 +697,7 @@
 		hdmi-controller = <&hdmi_audio>;
 	};
 
-	v4l2_cap_0 {
+	v4l2_cap_0: v4l2_cap_0 {
 		compatible = "fsl,imx6q-v4l2-capture";
 		ipu_id = <0>;
 		csi_id = <0>;
