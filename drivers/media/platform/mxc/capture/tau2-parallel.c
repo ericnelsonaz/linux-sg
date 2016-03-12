@@ -32,6 +32,7 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/of_gpio.h>
+#include <linux/pinctrl/consumer.h>
 #include <linux/platform_device.h>
 #include <linux/proc_fs.h>
 #include <linux/types.h>
@@ -344,8 +345,16 @@ static struct v4l2_int_device tau2_int_device = {
 static int tau2_probe(struct platform_device *plat)
 {
 	int ret = 0;
+	struct pinctrl *pinctrl;
 
 	pr_info("%s\n", __func__);
+
+	pinctrl = devm_pinctrl_get_select_default(&plat->dev);
+	if (IS_ERR(pinctrl)) {
+		dev_err(&plat->dev, "can't get/select pinctrl\n");
+		return PTR_ERR(pinctrl);
+	}
+	dev_err(&plat->dev, "have pinctrl entries\n");
 
 	return ret;
 
