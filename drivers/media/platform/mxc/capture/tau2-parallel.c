@@ -87,7 +87,7 @@ static int ioctl_g_parm(struct v4l2_int_device *s, struct v4l2_streamparm *a)
 {
 	struct v4l2_captureparm *cparm = &a->parm.capture;
 
-	pr_info("%s\n", __func__);
+	pr_info("%s: %p\n", __func__, cparm);
 
 	switch (a->type) {
 		/* These are all the possible cases. */
@@ -346,23 +346,53 @@ static int tau2_probe(struct platform_device *plat)
 {
 	int ret = 0;
 	struct pinctrl *pinctrl;
+	struct sensor_data *sensor;
 
 	pr_info("%s\n", __func__);
 
 	pinctrl = devm_pinctrl_get_select_default(&plat->dev);
-	if (IS_ERR(pinctrl)) {
-		dev_err(&plat->dev, "can't get/select pinctrl\n");
-		return PTR_ERR(pinctrl);
+	if (IS_ERR(pinctrl))
+		dev_err(&plat->dev, "no pinctrl\n");
+
+	sensor = devm_kzalloc(&plat->dev, sizeof(*sensor), GFP_KERNEL);
+	if (!sensor)
+		return PTR_ERR(sensor);
+
+	ret = of_property_read_u32(plat->dev.of_node, "ipu", &sensor->ipu_id);
+	if (ret) {
+		dev_err(&plat->dev, "ipu missing or invalid\n");
+		goto bail;
 	}
-	dev_err(&plat->dev, "have pinctrl entries\n");
 
+	ret = of_property_read_u32(plat->dev.of_node, "csi", &sensor->csi);
+	if (ret) {
+		dev_err(&plat->dev, "csi missing or invalid\n");
+		goto bail;
+	}
+
+	sensor->pix.pixelformat = V4L2_PIX_FMT_Y16;
+	sensor->pix.width = 336;
+	sensor->pix.height = 256;
+	sensor->streamcap.capability = V4L2_MODE_HIGHQUALITY |
+	    V4L2_CAP_TIMEPERFRAME;
+	sensor->streamcap.capturemode = 0;
+	sensor->streamcap.timeperframe.denominator = 60;
+	sensor->streamcap.timeperframe.numerator = 1;
+
+	tau2_int_device.priv = sensor;
+
+	ret = v4l2_int_device_register(&tau2_int_device);
+
+	dev_err(&plat->dev, "%s: %d\n", __func__, ret);
+
+bail:
 	return ret;
-
 }
 
 static int tau2_remove(struct platform_device *plat)
 {
 	pr_info("%s\n", __func__);
+	v4l2_int_device_unregister(&tau2_int_device);
 	return 0;
 }
 
