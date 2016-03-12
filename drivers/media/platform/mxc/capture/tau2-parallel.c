@@ -372,7 +372,18 @@ struct platform_driver tau2_driver = {
 	.remove = tau2_remove,
 };
 
-module_platform_driver(tau2_driver);
+static int __init mod_init(void)
+{
+	return platform_driver_probe(&tau2_driver, tau2_probe);
+}
+
+static void __exit mod_exit(void)
+{
+	platform_driver_unregister(&tau2_driver);
+}
+
+module_init(mod_init);
+module_exit(mod_exit);
 
 MODULE_DESCRIPTION("tau2 camera sensor driver");
 MODULE_LICENSE("GPL");
