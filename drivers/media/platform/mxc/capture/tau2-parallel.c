@@ -62,7 +62,7 @@
  */
 static int ioctl_g_ifparm(struct v4l2_int_device *s, struct v4l2_ifparm *p)
 {
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	memset(p, 0, sizeof(*p));
 	return 0;
@@ -70,7 +70,7 @@ static int ioctl_g_ifparm(struct v4l2_int_device *s, struct v4l2_ifparm *p)
 
 static int ioctl_s_power(struct v4l2_int_device *s, int on)
 {
-	pr_debug("%s: set power %s\n", __func__, on ? "on" : "off");
+	pr_info("%s: set power %s\n", __func__, on ? "on" : "off");
 
 	return 0;
 }
@@ -86,12 +86,12 @@ static int ioctl_g_parm(struct v4l2_int_device *s, struct v4l2_streamparm *a)
 {
 	struct v4l2_captureparm *cparm = &a->parm.capture;
 
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	switch (a->type) {
 		/* These are all the possible cases. */
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
-		pr_debug("   type is V4L2_BUF_TYPE_VIDEO_CAPTURE\n");
+		pr_info("   type is V4L2_BUF_TYPE_VIDEO_CAPTURE\n");
 		break;
 
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT:
@@ -100,7 +100,7 @@ static int ioctl_g_parm(struct v4l2_int_device *s, struct v4l2_streamparm *a)
 	case V4L2_BUF_TYPE_VBI_OUTPUT:
 	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT:
-		pr_debug("ioctl_g_parm:type is unknown %d\n", a->type);
+		pr_info("ioctl_g_parm:type is unknown %d\n", a->type);
 		break;
 	}
 	return 0;
@@ -121,7 +121,7 @@ static int ioctl_s_parm(struct v4l2_int_device *s, struct v4l2_streamparm *a)
 {
 	int ret = 0;
 
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	switch (a->type) {
 	/* This is the only case currently handled. */
@@ -135,7 +135,7 @@ static int ioctl_s_parm(struct v4l2_int_device *s, struct v4l2_streamparm *a)
 	case V4L2_BUF_TYPE_VBI_OUTPUT:
 	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT:
-		pr_debug("   type is unknown - %d\n", a->type);
+		pr_info("   type is unknown - %d\n", a->type);
 		ret = -EINVAL;
 		break;
 	}
@@ -152,7 +152,7 @@ static int ioctl_s_parm(struct v4l2_int_device *s, struct v4l2_streamparm *a)
  */
 static int ioctl_g_fmt_cap(struct v4l2_int_device *s, struct v4l2_format *f)
 {
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	switch (f->type) {
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
@@ -181,7 +181,7 @@ static int ioctl_g_fmt_cap(struct v4l2_int_device *s, struct v4l2_format *f)
  */
 static int ioctl_queryctrl(struct v4l2_int_device *s, struct v4l2_queryctrl *qc)
 {
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 	return -EINVAL;
 }
 
@@ -198,7 +198,7 @@ static int ioctl_g_ctrl(struct v4l2_int_device *s, struct v4l2_control *vc)
 {
 	int ret = -EINVAL;
 
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	return ret;
 }
@@ -216,7 +216,7 @@ static int ioctl_s_ctrl(struct v4l2_int_device *s, struct v4l2_control *vc)
 {
 	int retval = -EINVAL;
 
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	return retval;
 }
@@ -232,7 +232,7 @@ static int ioctl_s_ctrl(struct v4l2_int_device *s, struct v4l2_control *vc)
 static int ioctl_enum_framesizes(struct v4l2_int_device *s,
 				 struct v4l2_frmsizeenum *fsize)
 {
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	return 0;
 }
@@ -247,7 +247,7 @@ static int ioctl_enum_framesizes(struct v4l2_int_device *s,
  */
 static int ioctl_g_chip_ident(struct v4l2_int_device *s, int *id)
 {
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	((struct v4l2_dbg_chip_ident *)id)->match.type =
 	    V4L2_CHIP_MATCH_I2C_DRIVER;
@@ -266,7 +266,7 @@ static int ioctl_g_chip_ident(struct v4l2_int_device *s, int *id)
 static int ioctl_enum_fmt_cap(struct v4l2_int_device *s,
 			      struct v4l2_fmtdesc *fmt)
 {
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	return 0;
 }
@@ -277,7 +277,7 @@ static int ioctl_enum_fmt_cap(struct v4l2_int_device *s,
  */
 static int ioctl_init(struct v4l2_int_device *s)
 {
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 	return 0;
 }
 
@@ -289,7 +289,7 @@ static int ioctl_init(struct v4l2_int_device *s)
  */
 static int ioctl_dev_init(struct v4l2_int_device *s)
 {
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 	return 0;
 }
 
@@ -345,7 +345,7 @@ static int tau2_probe(struct platform_device *plat)
 {
 	int ret = 0;
 
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 	return ret;
 
@@ -353,7 +353,7 @@ static int tau2_probe(struct platform_device *plat)
 
 static int tau2_remove(struct platform_device *plat)
 {
-	pr_debug("%s\n", __func__);
+	pr_info("%s\n", __func__);
 	return 0;
 }
 
