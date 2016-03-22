@@ -394,7 +394,8 @@ static inline int valid_mode(u32 palette)
 		(palette == V4L2_PIX_FMT_YUYV) ||
 		(palette == V4L2_PIX_FMT_YUV420) ||
 		(palette == V4L2_PIX_FMT_YVU420) ||
-		(palette == V4L2_PIX_FMT_NV12));
+		(palette == V4L2_PIX_FMT_NV12) ||
+		(palette == V4L2_PIX_FMT_Y16));
 }
 
 /*!
@@ -917,6 +918,10 @@ static int mxc_v4l2_s_fmt(cam_data *cam, struct v4l2_format *f)
 			size = f->fmt.pix.width * f->fmt.pix.height * 3 / 2;
 			bytesperline = f->fmt.pix.width;
 			break;
+		case V4L2_PIX_FMT_Y16:
+			bytesperline = f->fmt.pix.width * 2;
+			size = bytesperline * f->fmt.pix.height;
+			break;
 		default:
 			break;
 		}
@@ -926,8 +931,10 @@ static int mxc_v4l2_s_fmt(cam_data *cam, struct v4l2_format *f)
 		else
 			bytesperline = f->fmt.pix.bytesperline;
 
-		if (f->fmt.pix.sizeimage < size)
+		if (f->fmt.pix.sizeimage < size) {
+			pr_err("%s: clamping size to %u\n", __func__, size);
 			f->fmt.pix.sizeimage = size;
+		}
 		else
 			size = f->fmt.pix.sizeimage;
 
@@ -1361,7 +1368,7 @@ void setup_ifparm(cam_data *cam, int init_defrect)
 				IPU_CSI_CLK_MODE_CCIR656_INTERLACED :
 				IPU_CSI_CLK_MODE_GATED_CLK;
 	}
-csi_param.clk_mode = IPU_CSI_CLK_MODE_NONGATED_CLK;
+csi_param.clk_mode = IPU_CSI_CLK_MODE_GATED_CLK;
 	csi_param.pixclk_pol = ifparm.u.bt656.latch_clk_inv;
 
 	switch (ifparm.u.bt656.mode) {
@@ -1380,11 +1387,12 @@ csi_param.clk_mode = IPU_CSI_CLK_MODE_NONGATED_CLK;
 			break;
 	}
 
-	csi_param.pack_tight = (csi_param.data_width != IPU_CSI_DATA_WIDTH_8) ? 1 : 0;
+	csi_param.pack_tight = 0;
 
 	csi_param.Vsync_pol = 1;
-	csi_param.Hsync_pol = 1;
-	csi_param.ext_vsync = ifparm.u.bt656.bt_sync_correct;
+	csi_param.Hsync_pol = 0;
+	csi_param.pixclk_pol = 0;
+	csi_param.ext_vsync = 0; // ifparm.u.bt656.bt_sync_correct;
 	pr_debug("vsync_pol(%d) hsync_pol(%d) ext_vsync(%d)\n", csi_param.Vsync_pol, csi_param.Hsync_pol, csi_param.ext_vsync);
 
 	/* if the capturemode changed, the size bounds will have changed. */
@@ -3159,7 +3167,7 @@ static int mxc_v4l2_master_attach(struct v4l2_int_device *slave)
 	int i;
 	struct sensor_data *sdata = slave->priv;
 
-	pr_debug("%s:slave.name = %s, master.name = %s\n", __func__,
+	pr_err("%s:slave.name = %s, master.name = %s\n", __func__,
 		slave->name, slave->u.slave->master->name);
 
 	if (slave == NULL) {
@@ -3193,6 +3201,8 @@ static int mxc_v4l2_master_attach(struct v4l2_int_device *slave)
 	cam_fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	vidioc_int_g_fmt_cap(cam->sensor, &cam_fmt);
 
+	pr_err("%s: size %u -> %u\n", __func__, cam->v2f.fmt.pix.sizeimage, cam_fmt.fmt.pix.sizeimage);
+	cam->v2f.fmt.pix = cam_fmt.fmt.pix;
 	/* Used to detect TV in (type 1) vs. camera (type 0)*/
 	cam->device_type = cam_fmt.fmt.pix.priv;
 
