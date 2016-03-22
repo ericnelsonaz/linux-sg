@@ -164,7 +164,11 @@ static int ioctl_g_fmt_cap(struct v4l2_int_device *s, struct v4l2_format *f)
 	switch (f->type) {
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
 		f->fmt.pix = sensor->pix;
-		pr_info("%s: %dx%d\n", __func__, sensor->pix.width, sensor->pix.height);
+		pr_info("%s: %dx%d, pixelfmt 0x%08x, %ubpl, %u bytes/frame, colorspace %d\n",
+			__func__,
+			sensor->pix.width, sensor->pix.height,
+			sensor->pix.pixelformat, sensor->pix.bytesperline,
+			sensor->pix.sizeimage, sensor->pix.colorspace);
 		break;
 
 	case V4L2_BUF_TYPE_SENSOR:
@@ -280,7 +284,10 @@ static int ioctl_g_chip_ident(struct v4l2_int_device *s, int *id)
 static int ioctl_enum_fmt_cap(struct v4l2_int_device *s,
 			      struct v4l2_fmtdesc *fmt)
 {
-	pr_info("%s\n", __func__);
+	pr_info("%s: %d\n", __func__, fmt->index);
+	if (fmt->index > 0)
+		return -EINVAL;
+	fmt->pixelformat = V4L2_PIX_FMT_Y16;
 
 	return 0;
 }
@@ -376,6 +383,9 @@ static int tau2_probe(struct platform_device *plat)
 	sensor->pix.height = sensor->spix.sheight = 256;
 	sensor->streamcap.capability = V4L2_MODE_HIGHQUALITY |
 	    V4L2_CAP_TIMEPERFRAME;
+	sensor->pix.bytesperline = (2 * sensor->pix.width);
+	sensor->pix.sizeimage = sensor->pix.bytesperline * sensor->pix.height;
+	pr_err("%s: %u bytes/image\n", __func__, sensor->pix.sizeimage);
 	sensor->streamcap.capturemode = 0;
 	sensor->streamcap.timeperframe.denominator = 60;
 	sensor->streamcap.timeperframe.numerator = 1;
