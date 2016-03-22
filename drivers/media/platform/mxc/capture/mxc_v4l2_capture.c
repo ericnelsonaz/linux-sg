@@ -11,6 +11,7 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
+#define DEBUG
 /*!
  * @file drivers/media/video/mxc/capture/mxc_v4l2_capture.c
  *
@@ -1069,7 +1070,7 @@ static int mxc_v4l2_g_ctrl(cam_data *cam, struct v4l2_control *c)
 		}
 		break;
 	default:
-		pr_err("ERROR: v4l2 capture: unsupported ioctrl!\n");
+		pr_err("ERROR: v4l2 capture: unsupported ioctrl %d!\n", c->id);
 	}
 
 	return status;
@@ -1360,18 +1361,29 @@ void setup_ifparm(cam_data *cam, int init_defrect)
 				IPU_CSI_CLK_MODE_CCIR656_INTERLACED :
 				IPU_CSI_CLK_MODE_GATED_CLK;
 	}
-
+csi_param.clk_mode = IPU_CSI_CLK_MODE_NONGATED_CLK;
 	csi_param.pixclk_pol = ifparm.u.bt656.latch_clk_inv;
 
-	csi_param.data_width =
-		(ifparm.u.bt656.mode == V4L2_IF_TYPE_BT656_MODE_NOBT_10BIT) ||
-		(ifparm.u.bt656.mode == V4L2_IF_TYPE_BT656_MODE_BT_10BIT) ?
-		IPU_CSI_DATA_WIDTH_10 : IPU_CSI_DATA_WIDTH_8;
+	switch (ifparm.u.bt656.mode) {
+		case V4L2_IF_TYPE_BT656_MODE_BT_8BIT:
+		case V4L2_IF_TYPE_BT656_MODE_NOBT_8BIT:
+			csi_param.data_width = IPU_CSI_DATA_WIDTH_8;
+			break;
+		case V4L2_IF_TYPE_BT656_MODE_BT_10BIT:
+		case V4L2_IF_TYPE_BT656_MODE_NOBT_10BIT:
+			csi_param.data_width = IPU_CSI_DATA_WIDTH_10;
+			break;
+		case V4L2_IF_TYPE_BT656_MODE_NOBT_12BIT:
+		case V4L2_IF_TYPE_BT656_MODE_NOBT_14BIT:
+		case V4L2_IF_TYPE_BT656_MODE_NOBT_16BIT:
+			csi_param.data_width = IPU_CSI_DATA_WIDTH_16;
+			break;
+	}
 
-	csi_param.pack_tight = (csi_param.data_width == IPU_CSI_DATA_WIDTH_10) ? 1 : 0;
+	csi_param.pack_tight = (csi_param.data_width != IPU_CSI_DATA_WIDTH_8) ? 1 : 0;
 
-	csi_param.Vsync_pol = ifparm.u.bt656.nobt_vs_inv;
-	csi_param.Hsync_pol = ifparm.u.bt656.nobt_hs_inv;
+	csi_param.Vsync_pol = 1;
+	csi_param.Hsync_pol = 1;
 	csi_param.ext_vsync = ifparm.u.bt656.bt_sync_correct;
 	pr_debug("vsync_pol(%d) hsync_pol(%d) ext_vsync(%d)\n", csi_param.Vsync_pol, csi_param.Hsync_pol, csi_param.ext_vsync);
 
@@ -1381,7 +1393,7 @@ void setup_ifparm(cam_data *cam, int init_defrect)
 	pr_debug("   g_fmt_cap returns widthxheight of input as %d x %d\n",
 			cam_fmt.fmt.pix.width, cam_fmt.fmt.pix.height);
 
-	csi_param.data_fmt = cam_fmt.fmt.pix.pixelformat;
+	csi_param.data_fmt = IPU_PIX_FMT_GENERIC_16;
 
 	cam->crop_bounds.top = cam->crop_bounds.left = 0;
 	cam->crop_bounds.width = cam_fmt.fmt.pix.width;
@@ -1430,6 +1442,11 @@ void setup_ifparm(cam_data *cam, int init_defrect)
 		sleft =  cam_fmt.fmt.spix.left;
 		stop =  cam_fmt.fmt.spix.top;
 	}
+	pr_debug("%s: window size %ux%u/%ux%u @%u:%u\n",
+	       __func__, swidth, sheight, 
+	       cam->crop_current.width, cam->crop_current.height,
+	       sleft + cam->crop_current.left, stop + cam->crop_current.top);
+
 	/* This essentially loses the data at the left and bottom of the image
 	 * giving a digital zoom image, if crop_current is less than the full
 	 * size of the image. */
@@ -1438,9 +1455,11 @@ void setup_ifparm(cam_data *cam, int init_defrect)
 			cam->crop_current.width, cam->crop_current.height,
 			sleft + cam->crop_current.left, stop + cam->crop_current.top,
 			cam->csi);
+	pr_debug("%s: pixfmt 0x%08x, %ux%u\n", __func__, csi_param.data_fmt,
+	       cam->crop_bounds.width, cam->crop_bounds.height);
 	ipu_csi_init_interface(cam->ipu, cam->crop_bounds.width,
 			       cam->crop_bounds.height,
-			       csi_param.data_fmt, csi_param);
+			       IPU_PIX_FMT_GENERIC_16, csi_param);
 }
 
 /*!
