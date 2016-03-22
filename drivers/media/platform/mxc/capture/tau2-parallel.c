@@ -25,6 +25,7 @@
  *
  * @ingroup Camera
  */
+#define DEBUG
 
 #include <linux/delay.h>
 #include <linux/device.h>
@@ -66,12 +67,13 @@ static int ioctl_g_ifparm(struct v4l2_int_device *s, struct v4l2_ifparm *p)
 	pr_info("%s\n", __func__);
 
 	memset(p, 0, sizeof(*p));
-	return 0;
-}
 
-static int ioctl_s_power(struct v4l2_int_device *s, int on)
-{
-	pr_info("%s: set power %s\n", __func__, on ? "on" : "off");
+	p->u.bt656.clock_curr = 24000000;
+	p->if_type = V4L2_IF_TYPE_BT656;
+	p->u.bt656.mode = V4L2_IF_TYPE_BT656_MODE_NOBT_16BIT;
+	p->u.bt656.clock_min = p->u.bt656.clock_curr;
+	p->u.bt656.clock_max = p->u.bt656.clock_curr;
+	p->u.bt656.bt_sync_correct = 1;  /* Indicate external vsync */
 
 	return 0;
 }
@@ -85,16 +87,18 @@ static int ioctl_s_power(struct v4l2_int_device *s, int on)
  */
 static int ioctl_g_parm(struct v4l2_int_device *s, struct v4l2_streamparm *a)
 {
-	struct v4l2_captureparm *cparm = &a->parm.capture;
-
-	pr_info("%s: %p\n", __func__, cparm);
+	pr_info("%s\n", __func__);
 
 	switch (a->type) {
 		/* These are all the possible cases. */
-	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
-		pr_info("   type is V4L2_BUF_TYPE_VIDEO_CAPTURE\n");
+	case V4L2_BUF_TYPE_VIDEO_CAPTURE: {
+		struct sensor_data *sensor = s->priv;
+		a->parm.capture.capability = sensor->streamcap.capability;
+		a->parm.capture.capturemode = sensor->streamcap.capturemode;
+		a->parm.capture.timeperframe.numerator = 1;
+		a->parm.capture.timeperframe.denominator = 60;
 		break;
-
+	}
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT:
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY:
 	case V4L2_BUF_TYPE_VBI_CAPTURE:
@@ -153,21 +157,27 @@ static int ioctl_s_parm(struct v4l2_int_device *s, struct v4l2_streamparm *a)
  */
 static int ioctl_g_fmt_cap(struct v4l2_int_device *s, struct v4l2_format *f)
 {
-	pr_info("%s\n", __func__);
+	struct sensor_data *sensor = s->priv;
+
+	pr_info("%s: type %d: sensor %p\n", __func__, f->type, sensor);
 
 	switch (f->type) {
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
+		f->fmt.pix = sensor->pix;
+		pr_info("%s: %dx%d\n", __func__, sensor->pix.width, sensor->pix.height);
 		break;
 
 	case V4L2_BUF_TYPE_SENSOR:
-		break;
-
-	case V4L2_BUF_TYPE_PRIVATE:
+		f->fmt.spix = sensor->spix;
+		pr_info("%s: left=%d, top=%d, %dx%d\n", __func__,
+			sensor->spix.left, sensor->spix.top,
+			sensor->spix.swidth, sensor->spix.sheight);
 		break;
 
 	default:
 		break;
 	}
+
 	return 0;
 }
 
@@ -197,9 +207,9 @@ static int ioctl_queryctrl(struct v4l2_int_device *s, struct v4l2_queryctrl *qc)
  */
 static int ioctl_g_ctrl(struct v4l2_int_device *s, struct v4l2_control *vc)
 {
-	int ret = -EINVAL;
+	int ret = 0;
 
-	pr_info("%s\n", __func__);
+	pr_info("%s:%s: %x\n", __FILE__, __func__, vc->id);
 
 	return ret;
 }
@@ -215,11 +225,9 @@ static int ioctl_g_ctrl(struct v4l2_int_device *s, struct v4l2_control *vc)
  */
 static int ioctl_s_ctrl(struct v4l2_int_device *s, struct v4l2_control *vc)
 {
-	int retval = -EINVAL;
+	pr_info("%s:%s: %x\n", __FILE__, __func__, vc->id);
 
-	pr_info("%s\n", __func__);
-
-	return retval;
+	return 0;
 }
 
 /*!
@@ -233,8 +241,13 @@ static int ioctl_s_ctrl(struct v4l2_int_device *s, struct v4l2_control *vc)
 static int ioctl_enum_framesizes(struct v4l2_int_device *s,
 				 struct v4l2_frmsizeenum *fsize)
 {
-	pr_info("%s\n", __func__);
+	struct sensor_data *sensor = s->priv;
 
+	fsize->pixel_format = V4L2_PIX_FMT_Y16;
+	fsize->discrete.width = sensor->pix.width;
+	fsize->discrete.height = sensor->pix.height;
+
+	pr_info("%s: %04x: %ux%u\n", __func__, fsize->pixel_format, fsize->discrete.width, fsize->discrete.height );
 	return 0;
 }
 
@@ -273,16 +286,6 @@ static int ioctl_enum_fmt_cap(struct v4l2_int_device *s,
 }
 
 /*!
- * ioctl_init - V4L2 sensor interface handler for VIDIOC_INT_INIT
- * @s: pointer to standard V4L2 device structure
- */
-static int ioctl_init(struct v4l2_int_device *s)
-{
-	pr_info("%s\n", __func__);
-	return 0;
-}
-
-/*!
  * ioctl_dev_init - V4L2 sensor interface handler for vidioc_int_dev_init_num
  * @s: pointer to standard V4L2 device structure
  *
@@ -300,9 +303,7 @@ static int ioctl_dev_init(struct v4l2_int_device *s)
 static struct v4l2_int_ioctl_desc tau2_ioctl_desc[] = {
 
 	{vidioc_int_dev_init_num, (v4l2_int_ioctl_func *) ioctl_dev_init},
-	{vidioc_int_s_power_num, (v4l2_int_ioctl_func *) ioctl_s_power},
 	{vidioc_int_g_ifparm_num, (v4l2_int_ioctl_func *) ioctl_g_ifparm},
-	{vidioc_int_init_num, (v4l2_int_ioctl_func *) ioctl_init},
 
 	/*!
 	 * VIDIOC_ENUM_FMT ioctl for the CAPTURE buffer type.
@@ -371,8 +372,8 @@ static int tau2_probe(struct platform_device *plat)
 	}
 
 	sensor->pix.pixelformat = V4L2_PIX_FMT_Y16;
-	sensor->pix.width = 336;
-	sensor->pix.height = 256;
+	sensor->pix.width = sensor->spix.swidth = 336;
+	sensor->pix.height = sensor->spix.sheight = 256;
 	sensor->streamcap.capability = V4L2_MODE_HIGHQUALITY |
 	    V4L2_CAP_TIMEPERFRAME;
 	sensor->streamcap.capturemode = 0;
