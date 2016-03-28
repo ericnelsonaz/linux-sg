@@ -1368,7 +1368,7 @@ void setup_ifparm(cam_data *cam, int init_defrect)
 				IPU_CSI_CLK_MODE_CCIR656_INTERLACED :
 				IPU_CSI_CLK_MODE_GATED_CLK;
 	}
-csi_param.clk_mode = IPU_CSI_CLK_MODE_GATED_CLK;
+csi_param.clk_mode = IPU_CSI_CLK_MODE_NONGATED_CLK;
 	csi_param.pixclk_pol = ifparm.u.bt656.latch_clk_inv;
 
 	switch (ifparm.u.bt656.mode) {
@@ -1392,7 +1392,7 @@ csi_param.clk_mode = IPU_CSI_CLK_MODE_GATED_CLK;
 	csi_param.Vsync_pol = 1;
 	csi_param.Hsync_pol = 0;
 	csi_param.pixclk_pol = 0;
-	csi_param.ext_vsync = 0; // ifparm.u.bt656.bt_sync_correct;
+	csi_param.ext_vsync = ifparm.u.bt656.bt_sync_correct;
 	pr_debug("vsync_pol(%d) hsync_pol(%d) ext_vsync(%d)\n", csi_param.Vsync_pol, csi_param.Hsync_pol, csi_param.ext_vsync);
 
 	/* if the capturemode changed, the size bounds will have changed. */
