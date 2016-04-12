@@ -1389,9 +1389,9 @@ csi_param.clk_mode = IPU_CSI_CLK_MODE_NONGATED_CLK;
 
 	csi_param.pack_tight = 0;
 
-	csi_param.Vsync_pol = 1;
+	csi_param.Vsync_pol = 0;
 	csi_param.Hsync_pol = 0;
-	csi_param.pixclk_pol = 0;
+	csi_param.pixclk_pol = 1;
 	csi_param.ext_vsync = ifparm.u.bt656.bt_sync_correct;
 	pr_debug("vsync_pol(%d) hsync_pol(%d) ext_vsync(%d)\n", csi_param.Vsync_pol, csi_param.Hsync_pol, csi_param.ext_vsync);
 
