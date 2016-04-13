@@ -379,12 +379,12 @@ static int tau2_probe(struct platform_device *plat)
 	}
 
 	sensor->pix.pixelformat = V4L2_PIX_FMT_Y16;
-	sensor->pix.width = 320;
-	sensor->spix.swidth = 336;
-	sensor->spix.left = 8;
-	sensor->pix.height = 240;
+	sensor->pix.width = 336;
+	sensor->spix.swidth = 665;
+	sensor->spix.left = 0;
+	sensor->pix.height = 256;
 	sensor->spix.sheight = 256;
-	sensor->spix.top = 8;
+	sensor->spix.top = 0;
 	sensor->streamcap.capability = V4L2_MODE_HIGHQUALITY |
 	    V4L2_CAP_TIMEPERFRAME;
 	sensor->pix.bytesperline = (2 * sensor->pix.width);
