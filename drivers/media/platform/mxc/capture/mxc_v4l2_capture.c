@@ -1462,8 +1462,12 @@ csi_param.clk_mode = IPU_CSI_CLK_MODE_NONGATED_CLK;
 			cam->crop_current.width, cam->crop_current.height,
 			sleft + cam->crop_current.left, stop + cam->crop_current.top,
 			cam->csi);
-	pr_debug("%s: pixfmt 0x%08x, %ux%u\n", __func__, csi_param.data_fmt,
+	pr_info("%s: pixfmt 0x%08x, %ux%u\n", __func__, csi_param.data_fmt,
 	       cam->crop_bounds.width, cam->crop_bounds.height);
+	pr_info("%s: clock mode 0x%x, pack %d\n", __func__,
+		csi_param.clk_mode, csi_param.pack_tight);
+	pr_info("%s: polarity vs:%d, hs:%d, pixclk:%d\n", __func__,
+		csi_param.Vsync_pol, csi_param.Hsync_pol, csi_param.pixclk_pol);
 	ipu_csi_init_interface(cam->ipu, cam->crop_bounds.width,
 			       cam->crop_bounds.height,
 			       csi_param.data_fmt, csi_param);
