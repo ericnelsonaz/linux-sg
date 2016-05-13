@@ -1467,7 +1467,7 @@ csi_param.clk_mode = IPU_CSI_CLK_MODE_NONGATED_CLK;
 	       cam->crop_bounds.width, cam->crop_bounds.height);
 	ipu_csi_init_interface(cam->ipu, cam->crop_bounds.width,
 			       cam->crop_bounds.height,
-			       IPU_PIX_FMT_GENERIC_16, csi_param);
+			       csi_param.data_fmt, csi_param);
 }
 
 /*!
