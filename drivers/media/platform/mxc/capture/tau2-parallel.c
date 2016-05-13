@@ -69,7 +69,7 @@ static int ioctl_g_ifparm(struct v4l2_int_device *s, struct v4l2_ifparm *p)
 	memset(p, 0, sizeof(*p));
 
 	p->u.bt656.clock_curr = 24000000;
-	p->if_type = V4L2_IF_TYPE_BT656;
+	p->if_type = V4L2_IF_TYPE_NONGATED;
 	p->u.bt656.mode = V4L2_IF_TYPE_BT656_MODE_NOBT_16BIT;
 	p->u.bt656.clock_min = p->u.bt656.clock_curr;
 	p->u.bt656.clock_max = p->u.bt656.clock_curr;
