@@ -74,6 +74,7 @@ static int ioctl_g_ifparm(struct v4l2_int_device *s, struct v4l2_ifparm *p)
 	p->u.bt656.clock_min = p->u.bt656.clock_curr;
 	p->u.bt656.clock_max = p->u.bt656.clock_curr;
 	p->u.bt656.bt_sync_correct = 1;  /* Indicate external vsync */
+	p->u.bt656.latch_clk_inv = 1;
 
 	return 0;
 }
