@@ -52,7 +52,7 @@
 };
 
 &v4l2_cap_1 {
-	status = "disabled";
+	status = "okay";
 };
 
 &v4l2_cap_2 {
