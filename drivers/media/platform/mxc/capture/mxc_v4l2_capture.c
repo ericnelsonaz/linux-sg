@@ -11,7 +11,6 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-#define DEBUG
 /*!
  * @file drivers/media/video/mxc/capture/mxc_v4l2_capture.c
  *
