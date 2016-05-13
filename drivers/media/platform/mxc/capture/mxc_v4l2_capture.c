@@ -1360,14 +1360,16 @@ void setup_ifparm(cam_data *cam, int init_defrect)
 		csi_param.clk_mode = IPU_CSI_CLK_MODE_CCIR656_INTERLACED;
 		break;
 	case V4L2_IF_TYPE_BT656:
-//		csi_param.clk_mode = IPU_CSI_CLK_MODE_CCIR656_PROGRESSIVE;
-//		break;
+		csi_param.clk_mode = IPU_CSI_CLK_MODE_CCIR656_PROGRESSIVE;
+		break;
+	case V4L2_IF_TYPE_NONGATED:
+		csi_param.clk_mode = IPU_CSI_CLK_MODE_NONGATED_CLK;
+		break;
 	default:
 		csi_param.clk_mode = (ifparm.u.bt656.clock_curr == 0) ?
 				IPU_CSI_CLK_MODE_CCIR656_INTERLACED :
 				IPU_CSI_CLK_MODE_GATED_CLK;
 	}
-csi_param.clk_mode = IPU_CSI_CLK_MODE_NONGATED_CLK;
 	csi_param.pixclk_pol = ifparm.u.bt656.latch_clk_inv;
 
 	switch (ifparm.u.bt656.mode) {
