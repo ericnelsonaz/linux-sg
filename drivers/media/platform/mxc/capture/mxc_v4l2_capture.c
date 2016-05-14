@@ -1399,7 +1399,9 @@ void setup_ifparm(cam_data *cam, int init_defrect)
 	pr_debug("   g_fmt_cap returns widthxheight of input as %d x %d\n",
 			cam_fmt.fmt.pix.width, cam_fmt.fmt.pix.height);
 
-	csi_param.data_fmt = IPU_PIX_FMT_GENERIC_16;
+	csi_param.data_fmt = (V4L2_PIX_FMT_Y16 == cam_fmt.fmt.pix.pixelformat)
+				? IPU_PIX_FMT_GENERIC_16
+				: cam_fmt.fmt.pix.pixelformat;
 
 	cam->crop_bounds.top = cam->crop_bounds.left = 0;
 	cam->crop_bounds.width = cam_fmt.fmt.pix.width;
