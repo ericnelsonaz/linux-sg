@@ -1359,9 +1359,9 @@ void setup_ifparm(cam_data *cam, int init_defrect)
 	case V4L2_IF_TYPE_BT656_INTERLACED:
 		csi_param.clk_mode = IPU_CSI_CLK_MODE_CCIR656_INTERLACED;
 		break;
-	case V4L2_IF_TYPE_BT656:
-		csi_param.clk_mode = IPU_CSI_CLK_MODE_CCIR656_PROGRESSIVE;
-		break;
+//	case V4L2_IF_TYPE_BT656:
+//		csi_param.clk_mode = IPU_CSI_CLK_MODE_CCIR656_PROGRESSIVE;
+//		break;
 	case V4L2_IF_TYPE_NONGATED:
 		csi_param.clk_mode = IPU_CSI_CLK_MODE_NONGATED_CLK;
 		break;
