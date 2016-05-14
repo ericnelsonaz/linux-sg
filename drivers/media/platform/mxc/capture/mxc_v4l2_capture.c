@@ -1389,6 +1389,8 @@ void setup_ifparm(cam_data *cam, int init_defrect)
 	}
 
 	csi_param.ext_vsync = ifparm.u.bt656.bt_sync_correct;
+	csi_param.Vsync_pol = ifparm.u.bt656.nobt_vs_inv;
+	csi_param.Hsync_pol = ifparm.u.bt656.nobt_hs_inv;
 	pr_debug("vsync_pol(%d) hsync_pol(%d) ext_vsync(%d)\n", csi_param.Vsync_pol, csi_param.Hsync_pol, csi_param.ext_vsync);
 
 	/* if the capturemode changed, the size bounds will have changed. */
