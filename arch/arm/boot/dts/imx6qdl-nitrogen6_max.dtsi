@@ -220,6 +220,8 @@
 
 	pinctrl_i2c3_ov5640: i2c3-ov5640grp {
 		/* parallel camera on CSI1, pins differ for iMX6Q/iMX6DL */
+		fsl,pins = <
+		>;
 	};
 
 	pinctrl_i2c3_ov5640_gpios: i2c3-ov5640-gpiosgrp {
